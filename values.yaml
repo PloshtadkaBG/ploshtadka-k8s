@@ -1,0 +1,177 @@
+# ── Global values (propagated to every subchart as .Values.global.*) ──────────
+global:
+  # Domain exposed via Traefik (used in IngressRoute match rules)
+  domain: ploshtadka.bg
+
+  # CloudNativePG creates this secret when the Cluster is initialised.
+  # It contains the key "uri" with the full postgresql:// connection string.
+  dbSecretName: ploshtadka-db-app
+
+  # Traefik entrypoint name. "web" (HTTP) for local, "websecure" (HTTPS) for prod.
+  entryPoint: web
+
+  tls:
+    enabled: false
+    # Name of the certificatesResolver defined in the Traefik Helm values.
+    certResolver: letsencrypt
+
+# ── Umbrella-level infra: Redis ───────────────────────────────────────────────
+redis:
+  architecture: standalone
+  auth:
+    enabled: false        # internal cache only; no external exposure
+  master:
+    persistence:
+      enabled: false      # cache is ephemeral by design
+  replica:
+    replicaCount: 0       # standalone mode
+
+# ── PostgreSQL cluster configuration (rendered in templates/cluster.yaml) ─────
+postgresql:
+  instances: 1            # increase to 3 for HA in prod
+  storage:
+    size: 10Gi
+  # Override with a sealed secret that contains POSTGRES_PASSWORD
+  credentialsSecretName: ploshtadka-db-credentials
+
+# ── Application subcharts ─────────────────────────────────────────────────────
+
+users-ms:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/ploshtadkabg/ploshtadka-users-ms
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 8000
+  config:
+    logLevel: INFO
+    accessTokenExpireMinutes: "120"
+    redisUrl: redis://ploshtadka-redis-master:6379/0
+  secrets:
+    # Name of the Sealed Secret that provides SECRET_KEY and GOOGLE_CLIENT_ID.
+    # Create with: kubectl create secret generic users-ms-secrets ... | kubeseal
+    name: users-ms-secrets
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+  hpa:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+venues-ms:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/ploshtadkabg/ploshtadka-venues-ms
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 8001
+  config:
+    logLevel: INFO
+    usersMsUrl: http://users-ms:8000
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+  hpa:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+bookings-ms:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/ploshtadkabg/ploshtadka-bookings-ms
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 8002
+  config:
+    logLevel: INFO
+    usersMsUrl: http://users-ms:8000
+    venuesMsUrl: http://venues-ms:8001
+    paymentsMsUrl: http://payments-ms:8003
+    redisUrl: redis://ploshtadka-redis-master:6379/0
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+  hpa:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+payments-ms:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/ploshtadkabg/ploshtadka-payments-ms
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 8003
+  config:
+    bookingsMsUrl: http://bookings-ms:8002
+    stripeSuccessUrl: http://ploshtadka.bg/bookings?payment=success
+    stripeCancelUrl: http://ploshtadka.bg/bookings?payment=cancelled
+    stripeCheckoutExpiresMinutes: "30"
+  secrets:
+    # Sealed Secret providing STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET
+    name: payments-ms-secrets
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+  hpa:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+
+frontend:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/ploshtadkabg/ploshtadka-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 3000
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
+      memory: 128Mi
+  hpa:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+admin-panel:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/ploshtadkabg/ploshtadka-admin-panel
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 3000
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
+      memory: 128Mi

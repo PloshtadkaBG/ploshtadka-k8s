@@ -1,0 +1,5 @@
+apiVersion: v2
+name: payments-ms
+description: Payments microservice (Stripe)
+type: application
+version: 1.0.0

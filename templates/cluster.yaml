@@ -1,0 +1,40 @@
+# CloudNativePG Cluster — requires the cloudnative-pg operator CRDs to be installed
+# first. The operator is installed as a Helm dependency in Chart.yaml.
+#
+# CloudNativePG automatically creates the secret "{{ .Values.global.dbSecretName }}"
+# (ploshtadka-db-app by default) containing the key "uri" with the full
+# postgresql:// connection string. All backend service deployments reference this.
+#
+# Services connect via the "-rw" endpoint (read-write, always the primary):
+#   postgresql://ploshtadka:<pass>@ploshtadka-db-rw:5432/ploshtadka
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: ploshtadka-db
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+spec:
+  instances: {{ .Values.postgresql.instances }}
+  imageName: ghcr.io/cloudnative-pg/postgresql:16
+
+  storage:
+    size: {{ .Values.postgresql.storage.size }}
+
+  bootstrap:
+    initdb:
+      database: ploshtadka
+      owner: ploshtadka
+      # Sealed secret providing POSTGRES_PASSWORD.
+      # Create with:
+      #   kubectl create secret generic ploshtadka-db-credentials \
+      #     --from-literal=password=<your-password> \
+      #     --dry-run=client -o yaml | kubeseal > sealed-secrets/db-credentials.yaml
+      secret:
+        name: {{ .Values.postgresql.credentialsSecretName }}
+
+  # Connection pooling endpoints created by CNPG:
+  #   ploshtadka-db-rw   → primary (read-write)
+  #   ploshtadka-db-ro   → any replica (read-only)
+  #   ploshtadka-db-r    → any instance

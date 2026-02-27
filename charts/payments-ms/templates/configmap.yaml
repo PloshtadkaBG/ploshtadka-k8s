@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "payments-ms.fullname" . }}-config
+  labels:
+    {{- include "payments-ms.labels" . | nindent 4 }}
+data:
+  BOOKINGS_MS_URL: {{ .Values.config.bookingsMsUrl | quote }}
+  STRIPE_SUCCESS_URL: {{ .Values.config.stripeSuccessUrl | quote }}
+  STRIPE_CANCEL_URL: {{ .Values.config.stripeCancelUrl | quote }}
+  STRIPE_CHECKOUT_EXPIRES_MINUTES: {{ .Values.config.stripeCheckoutExpiresMinutes | quote }}

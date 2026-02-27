@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "venues-ms.fullname" . }}-config
+  labels:
+    {{- include "venues-ms.labels" . | nindent 4 }}
+data:
+  LOG_LEVEL: {{ .Values.config.logLevel | quote }}
+  USERS_MS_URL: {{ .Values.config.usersMsUrl | quote }}

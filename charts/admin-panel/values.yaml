@@ -1,0 +1,15 @@
+replicaCount: 1
+image:
+  repository: ghcr.io/ploshtadkabg/ploshtadka-admin-panel
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  port: 3000
+resources:
+  requests:
+    memory: 64Mi
+    cpu: 50m
+  limits:
+    memory: 128Mi
+global:
+  domain: ploshtadka.bg

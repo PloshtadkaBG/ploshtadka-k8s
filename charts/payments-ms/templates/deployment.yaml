@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "payments-ms.fullname" . }}
+  labels:
+    {{- include "payments-ms.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "payments-ms.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "payments-ms.selectorLabels" . | nindent 8 }}
+    spec:
+      initContainers:
+        - name: migrate
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["sh", "-c", "uv run aerich upgrade || (uv run aerich init-db && uv run aerich upgrade)"]
+          envFrom:
+            - configMapRef:
+                name: {{ include "payments-ms.fullname" . }}-config
+            - secretRef:
+                name: {{ .Values.secrets.name }}
+          env:
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.dbSecretName }}
+                  key: uri
+
+      containers:
+        - name: payments-ms
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "payments-ms.fullname" . }}-config
+            - secretRef:
+                name: {{ .Values.secrets.name }}
+          env:
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.dbSecretName }}
+                  key: uri
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            failureThreshold: 30
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3

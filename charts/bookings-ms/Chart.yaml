@@ -1,0 +1,5 @@
+apiVersion: v2
+name: bookings-ms
+description: Bookings microservice
+type: application
+version: 1.0.0

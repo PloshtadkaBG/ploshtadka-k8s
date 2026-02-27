@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "users-ms.fullname" . }}
+  labels:
+    {{- include "users-ms.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "users-ms.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "users-ms.selectorLabels" . | nindent 8 }}
+    spec:
+      initContainers:
+        # Run Aerich migrations before the app starts.
+        # Aerich imports main.tortoise_conf, so it needs the full env (config + secrets + DB).
+        - name: migrate
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["sh", "-c", "uv run aerich upgrade || (uv run aerich init-db && uv run aerich upgrade)"]
+          envFrom:
+            - configMapRef:
+                name: {{ include "users-ms.fullname" . }}-config
+            - secretRef:
+                name: {{ .Values.secrets.name }}
+          env:
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.dbSecretName }}
+                  key: uri
+
+      containers:
+        - name: users-ms
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "users-ms.fullname" . }}-config
+            - secretRef:
+                name: {{ .Values.secrets.name }}
+          env:
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.global.dbSecretName }}
+                  key: uri
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          # startupProbe: generous window for slow first-boot (DB migration may still run)
+          startupProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            failureThreshold: 30
+            periodSeconds: 5
+          # livenessProbe: simple process-alive check — never queries DB
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          # readinessProbe: checks DB connectivity; pod removed from LB if it fails
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3

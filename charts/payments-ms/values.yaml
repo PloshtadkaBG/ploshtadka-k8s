@@ -1,0 +1,28 @@
+replicaCount: 1
+image:
+  repository: ghcr.io/ploshtadkabg/ploshtadka-payments-ms
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  port: 8003
+config:
+  bookingsMsUrl: http://bookings-ms:8002
+  stripeSuccessUrl: http://ploshtadka.bg/bookings?payment=success
+  stripeCancelUrl: http://ploshtadka.bg/bookings?payment=cancelled
+  stripeCheckoutExpiresMinutes: "30"
+secrets:
+  name: payments-ms-secrets
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 100m
+  limits:
+    memory: 256Mi
+hpa:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70
+global:
+  domain: ploshtadka.bg
+  dbSecretName: ploshtadka-db-app

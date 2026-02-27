@@ -1,0 +1,30 @@
+# Local Minikube overrides.
+# Images are built directly into Minikube's Docker daemon (eval $(minikube docker-env)).
+# Never is required so Kubernetes doesn't try to pull from ghcr.io.
+global:
+  domain: localhost
+
+users-ms:
+  image:
+    pullPolicy: Never
+venues-ms:
+  image:
+    pullPolicy: Never
+bookings-ms:
+  image:
+    pullPolicy: Never
+payments-ms:
+  image:
+    pullPolicy: Never
+frontend:
+  image:
+    pullPolicy: Never
+admin-panel:
+  image:
+    pullPolicy: Never
+
+# Single replica for each service locally
+postgresql:
+  instances: 1
+  storage:
+    size: 1Gi
