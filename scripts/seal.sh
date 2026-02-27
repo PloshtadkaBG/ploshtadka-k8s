@@ -23,6 +23,7 @@ echo "  → ploshtadka-db-credentials"
 read -rs -p "  PostgreSQL password: " PG_PASS; echo
 kubectl create secret generic ploshtadka-db-credentials \
   --namespace "$NS" \
+  --from-literal=username=ploshtadka \
   --from-literal=password="$PG_PASS" \
   --dry-run=client -o yaml \
   | kubeseal --format yaml \

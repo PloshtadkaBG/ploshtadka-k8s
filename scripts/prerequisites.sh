@@ -27,7 +27,8 @@ if [[ -n "$ACME_EMAIL" ]]; then
     --create-namespace \
     --set ports.web.expose.default=true \
     --set ports.websecure.expose.default=true \
-    --set "ports.web.redirectTo.port=websecure" \
+    --set "ports.web.http.redirections.entryPoint.to=websecure" \
+    --set "ports.web.http.redirections.entryPoint.scheme=https" \
     --set ingressRoute.dashboard.enabled=false \
     --set providers.kubernetesCRD.enabled=true \
     --set providers.kubernetesCRD.allowCrossNamespace=true \

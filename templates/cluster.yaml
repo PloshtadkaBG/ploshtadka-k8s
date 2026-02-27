@@ -26,9 +26,10 @@ spec:
     initdb:
       database: ploshtadka
       owner: ploshtadka
-      # Sealed secret providing POSTGRES_PASSWORD.
+      # Sealed secret providing username + password for the DB owner.
       # Create with:
       #   kubectl create secret generic ploshtadka-db-credentials \
+      #     --from-literal=username=ploshtadka \
       #     --from-literal=password=<your-password> \
       #     --dry-run=client -o yaml | kubeseal > sealed-secrets/db-credentials.yaml
       secret:
