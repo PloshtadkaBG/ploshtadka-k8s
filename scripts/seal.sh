@@ -9,7 +9,8 @@
 #   ./scripts/seal.sh [namespace]          # seal ALL secrets
 #   ./scripts/seal.sh [namespace] db       # seal only db-credentials
 #   ./scripts/seal.sh [namespace] users    # seal only users-ms-secrets
-#   ./scripts/seal.sh [namespace] payments # seal only payments-ms-secrets
+#   ./scripts/seal.sh [namespace] payments      # seal only payments-ms-secrets
+#   ./scripts/seal.sh [namespace] notifications # seal only notifications-ms-secrets
 #
 # Run this whenever you need to rotate a secret value. The resulting
 # sealed-secrets/*.yaml files are safe to commit to Git.
@@ -68,14 +69,26 @@ seal_payments() {
     > "$OUT/payments-ms-secrets.yaml"
 }
 
+seal_notifications() {
+  echo "  → notifications-ms-secrets"
+  read -rs -p "  RESEND_API_KEY: " RESEND_API_KEY; echo
+  kubectl create secret generic notifications-ms-secrets \
+    --namespace "$NS" \
+    --from-literal=RESEND_API_KEY="$RESEND_API_KEY" \
+    --dry-run=client -o yaml \
+    | kubeseal --format yaml \
+    > "$OUT/notifications-ms-secrets.yaml"
+}
+
 echo "Sealing secrets for namespace: $NS"
 
 case "$TARGET" in
   db)       seal_db ;;
   users)    seal_users ;;
-  payments) seal_payments ;;
-  all)      seal_db; seal_users; seal_payments ;;
-  *)        echo "Unknown target: $TARGET (use: db, users, payments, or all)"; exit 1 ;;
+  payments)      seal_payments ;;
+  notifications) seal_notifications ;;
+  all)           seal_db; seal_users; seal_payments; seal_notifications ;;
+  *)             echo "Unknown target: $TARGET (use: db, users, payments, notifications, or all)"; exit 1 ;;
 esac
 
 echo ""

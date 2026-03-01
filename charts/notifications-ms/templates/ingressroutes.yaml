@@ -1,0 +1,26 @@
+# notifications-ms is an internal service — other microservices call it
+# directly via http://notifications-ms:8004. These routes exist for
+# admin access to notification history via the API gateway.
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "notifications-ms.fullname" . }}-protected
+  labels:
+    {{- include "notifications-ms.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+    - {{ .Values.global.entryPoint | default "web" }}
+  routes:
+    - match: "Host(`{{ .Values.global.domain }}`) && PathPrefix(`/api/notifications`)"
+      priority: 5
+      middlewares:
+        - name: {{ include "notifications-ms.jwtAuthMiddleware" . }}
+        - name: {{ include "notifications-ms.apiStripMiddleware" . }}
+      services:
+        - name: notifications-ms
+          port: {{ .Values.service.port }}
+  {{- if and .Values.global.tls .Values.global.tls.enabled }}
+  tls:
+    certResolver: {{ .Values.global.tls.certResolver }}
+  {{- end }}

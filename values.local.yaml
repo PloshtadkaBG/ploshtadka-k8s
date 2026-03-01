@@ -16,6 +16,9 @@ bookings-ms:
 payments-ms:
   image:
     pullPolicy: Never
+notifications-ms:
+  image:
+    pullPolicy: Never
 frontend:
   image:
     pullPolicy: Never

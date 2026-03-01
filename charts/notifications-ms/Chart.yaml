@@ -1,0 +1,5 @@
+apiVersion: v2
+name: notifications-ms
+description: Notifications microservice (Resend email)
+type: application
+version: 1.0.0

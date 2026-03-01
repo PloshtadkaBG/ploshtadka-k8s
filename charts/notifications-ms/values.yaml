@@ -1,0 +1,31 @@
+replicaCount: 1
+image:
+  repository: ghcr.io/ploshtadkabg/ploshtadka-notifications-ms
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  port: 8004
+config:
+  logLevel: INFO
+  frontendBaseUrl: http://ploshtadka.bg
+secrets:
+  # provides RESEND_API_KEY
+  name: notifications-ms-secrets
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 100m
+  limits:
+    memory: 256Mi
+hpa:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 70
+global:
+  domain: xn--80aalycsf6f.xn--90ae
+  dbSecretName: ploshtadka-db-app
+  entryPoint: web
+  tls:
+    enabled: false
+    certResolver: letsencrypt

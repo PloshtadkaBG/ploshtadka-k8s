@@ -28,3 +28,9 @@ payments-ms:
   config:
     stripeSuccessUrl: http://staging.ploshtadka.bg/bookings?payment=success
     stripeCancelUrl: http://staging.ploshtadka.bg/bookings?payment=cancelled
+
+notifications-ms:
+  replicaCount: 1
+  config:
+    logLevel: DEBUG
+    frontendBaseUrl: http://staging.ploshtadka.bg
