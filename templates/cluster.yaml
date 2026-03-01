@@ -34,8 +34,3 @@ spec:
       #     --dry-run=client -o yaml | kubeseal > sealed-secrets/db-credentials.yaml
       secret:
         name: {{ .Values.postgresql.credentialsSecretName }}
-
-  # Connection pooling endpoints created by CNPG:
-  #   ploshtadka-db-rw   → primary (read-write)
-  #   ploshtadka-db-ro   → any replica (read-only)
-  #   ploshtadka-db-r    → any instance

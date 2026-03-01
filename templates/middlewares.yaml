@@ -1,5 +1,4 @@
 # Shared Traefik middlewares — referenced by all service IngressRoutes.
-# These mirror the Docker Compose label-based middleware definitions exactly.
 ---
 # Strips /api prefix before forwarding to backend services.
 # Backend services have no knowledge of the /api path prefix.
@@ -18,8 +17,7 @@ spec:
 ---
 # ForwardAuth: Traefik calls users-ms /auth/verify for every protected request.
 # On success, users-ms returns X-User-* headers which Traefik injects downstream.
-# Downstream services read these in app/deps.py::get_current_user() — they never
-# see or validate the JWT themselves.
+# Downstream services never see or validate the JWT themselves.
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:

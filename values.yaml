@@ -37,6 +37,7 @@ users-ms:
     logLevel: INFO
     accessTokenExpireMinutes: "120"
     redisUrl: redis://ploshtadka-redis-master:6379/0
+    contactEmail: ploshtadka.bg@gmail.com
   secrets:
     # provides SECRET_KEY and GOOGLE_CLIENT_ID.
     name: users-ms-secrets

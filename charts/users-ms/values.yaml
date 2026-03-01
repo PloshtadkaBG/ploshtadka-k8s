@@ -13,6 +13,7 @@ config:
   logLevel: INFO
   accessTokenExpireMinutes: "120"
   redisUrl: redis://ploshtadka-redis-master:6379/0
+  contactEmail: ploshtadka.bg@gmail.com
 
 secrets:
   name: users-ms-secrets
