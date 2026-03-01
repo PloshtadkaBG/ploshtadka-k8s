@@ -40,6 +40,7 @@ seal_users() {
   read -r  -p "  SMTP_PORT [587]: " SMTP_PORT; SMTP_PORT=${SMTP_PORT:-587}
   read -r  -p "  SMTP_USER: " SMTP_USER
   read -rs -p "  SMTP_PASSWORD: " SMTP_PASSWORD; echo
+  read -rs -p "  TURNSTILE_SECRET_KEY (Cloudflare): " TURNSTILE_SECRET_KEY; echo
   kubectl create secret generic users-ms-secrets \
     --namespace "$NS" \
     --from-literal=SECRET_KEY="$SECRET_KEY" \
@@ -48,6 +49,7 @@ seal_users() {
     --from-literal=SMTP_PORT="$SMTP_PORT" \
     --from-literal=SMTP_USER="$SMTP_USER" \
     --from-literal=SMTP_PASSWORD="$SMTP_PASSWORD" \
+    --from-literal=TURNSTILE_SECRET_KEY="$TURNSTILE_SECRET_KEY" \
     --dry-run=client -o yaml \
     | kubeseal --format yaml \
     > "$OUT/users-ms-secrets.yaml"

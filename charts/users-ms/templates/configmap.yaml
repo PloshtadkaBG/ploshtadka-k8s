@@ -9,3 +9,5 @@ data:
   ACCESS_TOKEN_EXPIRE_MINUTES: {{ .Values.config.accessTokenExpireMinutes | quote }}
   REDIS_URL: {{ .Values.config.redisUrl | quote }}
   CONTACT_EMAIL: {{ .Values.config.contactEmail | quote }}
+  CONTACT_RATE_LIMIT: {{ .Values.config.contactRateLimit | quote }}
+  CONTACT_RATE_WINDOW: {{ .Values.config.contactRateWindow | quote }}
