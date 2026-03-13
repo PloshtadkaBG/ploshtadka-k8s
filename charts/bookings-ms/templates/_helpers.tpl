@@ -21,3 +21,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "bookings-ms.apiStripMiddleware" -}}
 {{ .Release.Name }}-api-strip
 {{- end }}
+
+{{- define "bookings-ms.rlProtectedMiddleware" -}}
+{{ .Release.Name }}-rl-protected
+{{- end }}

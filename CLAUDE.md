@@ -35,6 +35,7 @@ charts/
   venues-ms/
   bookings-ms/
   payments-ms/
+  notifications-ms/    # Resend email service, port 8004
   frontend/            # TanStack Start SSR, port 3000
   admin-panel/         # React Router SPA, port 3000
 templates/

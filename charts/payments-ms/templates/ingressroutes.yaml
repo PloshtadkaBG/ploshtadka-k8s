@@ -62,6 +62,7 @@ spec:
       priority: 5
       middlewares:
         - name: {{ include "payments-ms.jwtAuthMiddleware" . }}
+        - name: {{ include "payments-ms.rlProtectedMiddleware" . }}
         - name: {{ include "payments-ms.apiStripMiddleware" . }}
       services:
         - name: payments-ms

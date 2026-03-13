@@ -16,6 +16,7 @@ spec:
       priority: 5
       middlewares:
         - name: {{ include "notifications-ms.jwtAuthMiddleware" . }}
+        - name: {{ include "notifications-ms.rlProtectedMiddleware" . }}
         - name: {{ include "notifications-ms.apiStripMiddleware" . }}
       services:
         - name: notifications-ms

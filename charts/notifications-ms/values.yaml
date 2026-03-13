@@ -7,7 +7,7 @@ service:
   port: 8004
 config:
   logLevel: INFO
-  frontendBaseUrl: http://ploshtadka.bg
+  frontendBaseUrl: https://xn--80aalycsf6f.xn--90ae
 secrets:
   # provides RESEND_API_KEY
   name: notifications-ms-secrets

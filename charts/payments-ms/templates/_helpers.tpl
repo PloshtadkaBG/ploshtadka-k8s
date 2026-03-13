@@ -21,3 +21,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "payments-ms.apiStripMiddleware" -}}
 {{ .Release.Name }}-api-strip
 {{- end }}
+
+{{- define "payments-ms.rlProtectedMiddleware" -}}
+{{ .Release.Name }}-rl-protected
+{{- end }}

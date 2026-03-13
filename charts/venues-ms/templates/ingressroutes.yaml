@@ -38,6 +38,7 @@ spec:
       priority: 5
       middlewares:
         - name: {{ include "venues-ms.jwtAuthMiddleware" . }}
+        - name: {{ include "venues-ms.rlProtectedMiddleware" . }}
         - name: {{ include "venues-ms.apiStripMiddleware" . }}
       services:
         - name: venues-ms

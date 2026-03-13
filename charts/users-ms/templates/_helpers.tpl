@@ -22,3 +22,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "users-ms.apiStripMiddleware" -}}
 {{ .Release.Name }}-api-strip
 {{- end }}
+
+{{- define "users-ms.rlPublicAuthMiddleware" -}}
+{{ .Release.Name }}-rl-public-auth
+{{- end }}
+
+{{- define "users-ms.rlProtectedMiddleware" -}}
+{{ .Release.Name }}-rl-protected
+{{- end }}

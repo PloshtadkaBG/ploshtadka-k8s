@@ -45,7 +45,7 @@ users-ms:
     name: users-ms-secrets
   resources:
     requests:
-      memory: 128Mi
+      memory: 256Mi
       cpu: 100m
     limits:
       memory: 256Mi
@@ -68,7 +68,7 @@ venues-ms:
     usersMsUrl: http://users-ms:8000
   resources:
     requests:
-      memory: 128Mi
+      memory: 256Mi
       cpu: 100m
     limits:
       memory: 256Mi
@@ -94,7 +94,7 @@ bookings-ms:
     redisUrl: redis://ploshtadka-redis-master:6379/0
   resources:
     requests:
-      memory: 128Mi
+      memory: 256Mi
       cpu: 100m
     limits:
       memory: 256Mi
@@ -114,15 +114,15 @@ payments-ms:
     port: 8003
   config:
     bookingsMsUrl: http://bookings-ms:8002
-    stripeSuccessUrl: http://xn--80aalycsf6f.xn--90ae/bookings?payment=success
-    stripeCancelUrl: http://xn--80aalycsf6f.xn--90ae/bookings?payment=cancelled
+    stripeSuccessUrl: https://xn--80aalycsf6f.xn--90ae/bookings?payment=success
+    stripeCancelUrl: https://xn--80aalycsf6f.xn--90ae/bookings?payment=cancelled
     stripeCheckoutExpiresMinutes: "30"
   secrets:
     # provides STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET
     name: payments-ms-secrets
   resources:
     requests:
-      memory: 128Mi
+      memory: 256Mi
       cpu: 100m
     limits:
       memory: 256Mi
@@ -142,14 +142,14 @@ notifications-ms:
     port: 8004
   config:
     logLevel: INFO
-    frontendBaseUrl: http://xn--80aalycsf6f.xn--90ae
+    frontendBaseUrl: https://xn--80aalycsf6f.xn--90ae
     fromEmail: 'Ploshtadka.BG <noreply@xn--80aalycsf6f.xn--90ae>'
   secrets:
     # provides RESEND_API_KEY
     name: notifications-ms-secrets
   resources:
     requests:
-      memory: 128Mi
+      memory: 256Mi
       cpu: 100m
     limits:
       memory: 256Mi
@@ -169,7 +169,7 @@ frontend:
     port: 3000
   resources:
     requests:
-      memory: 64Mi
+      memory: 128Mi
       cpu: 50m
     limits:
       memory: 128Mi
@@ -189,7 +189,7 @@ admin-panel:
     port: 3000
   resources:
     requests:
-      memory: 64Mi
+      memory: 128Mi
       cpu: 50m
     limits:
       memory: 128Mi

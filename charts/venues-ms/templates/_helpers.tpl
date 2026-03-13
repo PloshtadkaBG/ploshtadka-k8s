@@ -21,3 +21,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "venues-ms.apiStripMiddleware" -}}
 {{ .Release.Name }}-api-strip
 {{- end }}
+
+{{- define "venues-ms.rlProtectedMiddleware" -}}
+{{ .Release.Name }}-rl-protected
+{{- end }}

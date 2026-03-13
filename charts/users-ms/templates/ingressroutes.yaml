@@ -16,6 +16,7 @@ spec:
     - match: "Host(`{{ .Values.global.domain }}`) && (PathPrefix(`/api/auth`) || (Method(`POST`) && PathPrefix(`/api/users`)) || Method(`OPTIONS`))"
       priority: 10
       middlewares:
+        - name: {{ include "users-ms.rlPublicAuthMiddleware" . }}
         - name: {{ include "users-ms.apiStripMiddleware" . }}
       services:
         - name: users-ms
@@ -39,6 +40,7 @@ spec:
       priority: 5
       middlewares:
         - name: {{ include "users-ms.jwtAuthMiddleware" . }}
+        - name: {{ include "users-ms.rlProtectedMiddleware" . }}
         - name: {{ include "users-ms.apiStripMiddleware" . }}
       services:
         - name: users-ms

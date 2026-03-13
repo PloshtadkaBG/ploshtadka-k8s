@@ -38,6 +38,7 @@ spec:
       priority: 5
       middlewares:
         - name: {{ include "bookings-ms.jwtAuthMiddleware" . }}
+        - name: {{ include "bookings-ms.rlProtectedMiddleware" . }}
         - name: {{ include "bookings-ms.apiStripMiddleware" . }}
       services:
         - name: bookings-ms
